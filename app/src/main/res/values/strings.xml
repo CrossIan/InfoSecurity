@@ -4,5 +4,7 @@
     <string name="app_name">MAC-CellLocator</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_mac">MAC</string>
+    <string name="title_activity_triangle">triangle</string>
 
 </resources>
