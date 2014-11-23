@@ -1,24 +1,21 @@
 package com.infosecurity.mac_celllocator;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import javax.crypto.Mac;
 
-
-public class map extends Activity {
+public class RegisterAccessPointLocation extends Activity {
 
     final Context context = this;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map);
+        setContentView(R.layout.activity_mac);
     }
 
 
@@ -34,9 +31,9 @@ public class map extends Activity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.activity_mac:
-                Intent mac = new Intent(context, MAC.class);
+                Intent mac = new Intent(context, RegisterAccessPointLocation.class);
                 startActivity(mac);
                 break;
             case R.id.activity_map:
