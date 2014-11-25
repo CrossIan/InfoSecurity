@@ -49,6 +49,7 @@ public class RegisterAccessPointLocation extends Activity {
     public Map<String, WifiAccessPoint> mAccessPoints;
     public List<ScanResult> scanResults;
     public WifiAccessPoint[] lAccessPoints;
+    public int uX, uY, uZ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,10 @@ public class RegisterAccessPointLocation extends Activity {
 
 
         registerReceiver(mReceiver, mIntentFilter);
+
+        uX = 0;
+        uY = 0;
+        uZ = 0;
 
 
         lAccessPoints = new WifiAccessPoint[5];
@@ -280,6 +285,41 @@ public class RegisterAccessPointLocation extends Activity {
         }
     }
 
+    public void updateUserCoordinates()
+    {
+
+        int t = 0;
+        int tx = 0;
+        int ty = 0;
+        int tz = 0;
+
+        for(ScanResult scanResult : scanResults)
+        {
+            if(mAccessPoints.containsKey(scanResult.BSSID))
+            {
+                if(mAccessPoints.get(scanResult.BSSID).bInit)
+                {
+                    t += scanResult.level;
+                    tx += scanResult.level * mAccessPoints.get(scanResult.BSSID).iX;
+                    ty += scanResult.level * mAccessPoints.get(scanResult.BSSID).iY;
+                    tz += scanResult.level * mAccessPoints.get(scanResult.BSSID).iZ;
+                }
+            }
+        }
+
+        uX = tx/t;
+        uY = ty/t;
+        uZ = tz/t;
+
+        TextView disXval = (TextView) findViewById(R.id.disXval);
+        TextView disYval = (TextView) findViewById(R.id.disYval);
+        TextView disZval = (TextView) findViewById(R.id.disZval);
+
+        disXval.setText(""+uX);
+        disYval.setText(""+uY);
+        disZval.setText(""+uZ);
+    }
+
     /*
      * ************************************************************************
      * Declare a Broadcast Receiver that "responds" to Android system Intents.
@@ -317,12 +357,24 @@ public class RegisterAccessPointLocation extends Activity {
                     }
                 }
 
+                TextView apBssidVal0 = (TextView) findViewById(R.id.apBssidVal0);
+                TextView apSignalVal0 = (TextView) findViewById(R.id.apSignalVal0);
+                TextView apActiveVal0 = (TextView) findViewById(R.id.apActiveVal0);
+                TextView apBssidVal1 = (TextView) findViewById(R.id.apBssidVal1);
+                TextView apSignalVal1 = (TextView) findViewById(R.id.apSignalVal1);
+                TextView apActiveVal1 = (TextView) findViewById(R.id.apActiveVal1);
+                TextView apBssidVal2 = (TextView) findViewById(R.id.apBssidVal2);
+                TextView apSignalVal2 = (TextView) findViewById(R.id.apSignalVal2);
+                TextView apActiveVal2 = (TextView) findViewById(R.id.apActiveVal2);
+                TextView apBssidVal3 = (TextView) findViewById(R.id.apBssidVal3);
+                TextView apSignalVal3 = (TextView) findViewById(R.id.apSignalVal3);
+                TextView apActiveVal3 = (TextView) findViewById(R.id.apActiveVal3);
+                TextView apBssidVal4 = (TextView) findViewById(R.id.apBssidVal4);
+                TextView apSignalVal4 = (TextView) findViewById(R.id.apSignalVal4);
+                TextView apActiveVal4 = (TextView) findViewById(R.id.apActiveVal4);
+
                 if(lAccessPoints[0]!= null)
                 {
-                    TextView apBssidVal0 = (TextView) findViewById(R.id.apBssidVal0);
-                    TextView apSignalVal0 = (TextView) findViewById(R.id.apSignalVal0);
-                    TextView apActiveVal0 = (TextView) findViewById(R.id.apActiveVal0);
-
                     apBssidVal0.setText(lAccessPoints[0].sBSSID);
 
                     for(ScanResult scanResult : scanResults)
@@ -345,9 +397,6 @@ public class RegisterAccessPointLocation extends Activity {
 
                     if(lAccessPoints[1]!= null)
                     {
-                        TextView apBssidVal1 = (TextView) findViewById(R.id.apBssidVal1);
-                        TextView apSignalVal1 = (TextView) findViewById(R.id.apSignalVal1);
-                        TextView apActiveVal1 = (TextView) findViewById(R.id.apActiveVal1);
 
                         apBssidVal1.setText(lAccessPoints[1].sBSSID);
 
@@ -371,9 +420,6 @@ public class RegisterAccessPointLocation extends Activity {
 
                         if(lAccessPoints[2]!= null)
                         {
-                            TextView apBssidVal2 = (TextView) findViewById(R.id.apBssidVal2);
-                            TextView apSignalVal2 = (TextView) findViewById(R.id.apSignalVal2);
-                            TextView apActiveVal2 = (TextView) findViewById(R.id.apActiveVal2);
 
                             apBssidVal2.setText(lAccessPoints[2].sBSSID);
 
@@ -397,9 +443,6 @@ public class RegisterAccessPointLocation extends Activity {
 
                             if(lAccessPoints[3]!= null)
                             {
-                                TextView apBssidVal3 = (TextView) findViewById(R.id.apBssidVal3);
-                                TextView apSignalVal3 = (TextView) findViewById(R.id.apSignalVal3);
-                                TextView apActiveVal3 = (TextView) findViewById(R.id.apActiveVal3);
 
                                 apBssidVal3.setText(lAccessPoints[3].sBSSID);
 
@@ -423,9 +466,6 @@ public class RegisterAccessPointLocation extends Activity {
 
                                 if(lAccessPoints[4]!= null)
                                 {
-                                    TextView apBssidVal4 = (TextView) findViewById(R.id.apBssidVal4);
-                                    TextView apSignalVal4 = (TextView) findViewById(R.id.apSignalVal4);
-                                    TextView apActiveVal4 = (TextView) findViewById(R.id.apActiveVal4);
 
                                     apBssidVal4.setText(lAccessPoints[4].sBSSID);
 
@@ -454,7 +494,7 @@ public class RegisterAccessPointLocation extends Activity {
                     }
                 }
 
-
+                updateUserCoordinates();
 
             }
         }
