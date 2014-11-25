@@ -288,6 +288,7 @@ public class RegisterAccessPointLocation extends Activity {
     public void updateUserCoordinates()
     {
 
+        try {
         int t = 0;
         int tx = 0;
         int ty = 0;
@@ -318,6 +319,10 @@ public class RegisterAccessPointLocation extends Activity {
         disXval.setText(""+uX);
         disYval.setText(""+uY);
         disZval.setText(""+uZ);
+        }catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
     }
 
     /*
