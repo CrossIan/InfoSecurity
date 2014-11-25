@@ -23,12 +23,10 @@ public class WifiNetwork {
 
         if(mAccessPoints.containsKey(BSSID))
         {
-            mAccessPoints.get(BSSID).AddConnectionUpdate(connectionUpdate);
         }
         else
         {
-            mAccessPoints.put(BSSID,new WifiAccessPoint(BSSID));
-            mAccessPoints.get(BSSID).AddConnectionUpdate(connectionUpdate);
+            //mAccessPoints.put(BSSID,new WifiAccessPoint(BSSID));
         }
     }
 

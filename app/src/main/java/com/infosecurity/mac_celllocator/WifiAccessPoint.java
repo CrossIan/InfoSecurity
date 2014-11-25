@@ -9,44 +9,42 @@ import java.util.List;
  */
 public class WifiAccessPoint {
 
+    public String sSSID;
     public String sBSSID;
-    public List<WifiConnectionUpdate> lConnectionUpdates;
 
     public float fLatitude;
     public float fLongitude;
 
-    public WifiAccessPoint(String BSSID)
+
+    //This is the offset from the bottom southeast corner of Dreese Labs (in feet) (40.002140, -83.015666)
+    public int iX; //North
+    public int iY; //West
+    public int iZ; //Up
+
+    public boolean bInit; //Have the coordinates been set yet
+
+    public WifiAccessPoint(String SSID, String BSSID)
     {
+        sSSID = SSID;
         sBSSID = BSSID;
-        lConnectionUpdates = new ArrayList<WifiConnectionUpdate>(4096);
 
         fLatitude = 0f;
         fLongitude = 0f;
+
+        iX = 0;
+        iY = 0;
+        iZ = 0;
+
+        bInit = false;
     }
 
-    public void AddConnectionUpdate(WifiConnectionUpdate connectionUpdate)
-    {
-        lConnectionUpdates.add(connectionUpdate);
-    }
 
-    public void DetermineCoordinates()
+    public void SaveCoordinates(int iX, int iY, int iZ, boolean bInit)
     {
-        int maxSignalStrength = -100;
-        int count = 0;
-        for ( WifiConnectionUpdate connectionUpdate : lConnectionUpdates)
-        {
-            if(connectionUpdate.iSignalStrength>maxSignalStrength)
-            {
-                fLatitude = connectionUpdate.fLatitude;
-                fLongitude = connectionUpdate.fLongitude;
-                count = 1;
-            }
-            if(connectionUpdate.iSignalStrength==maxSignalStrength)
-            {
-                fLatitude = (count * fLatitude + connectionUpdate.fLatitude) / (count +1);
-                fLongitude = (count * fLongitude + connectionUpdate.fLongitude) / (count +1);
-                count ++;
-            }
-        }
+        this.iX = iX;
+        this.iY = iY;
+        this.iZ = iZ;
+
+        this.bInit = bInit;
     }
 }

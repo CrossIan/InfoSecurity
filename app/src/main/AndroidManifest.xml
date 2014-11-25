@@ -24,6 +24,10 @@
             android:name="com.infosecurity.mac_celllocator.triangle"
             android:label="@string/title_activity_triangle" >
         </activity>
+        <activity
+            android:name="com.infosecurity.mac_celllocator.RegisterAccessPointLocation"
+            android:label="RegisterAccessPointLocation">
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
