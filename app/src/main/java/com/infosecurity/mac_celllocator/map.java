@@ -47,6 +47,10 @@ public class map extends Activity {
                 Intent triangle = new Intent(context, triangle.class);
                 startActivity(triangle);
                 break;
+            case R.id.activity_register_access_point_location:
+                Intent registerAccessPointLocation = new Intent(context, RegisterAccessPointLocation.class);
+                startActivity(registerAccessPointLocation);
+                break;
             default:
                 return super.onOptionsItemSelected(item);
         }

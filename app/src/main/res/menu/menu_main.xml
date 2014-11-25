@@ -18,5 +18,10 @@
         android:orderInCategory="100"
         android:title="Triangulation" />
 
+    <item
+        android:id="@+id/activity_register_access_point_location"
+        android:orderInCategory="100"
+        android:title="Set Access Point Location" />
+
 
 </menu>
