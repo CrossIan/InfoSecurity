@@ -100,15 +100,20 @@ public class map extends FragmentActivity {
      * method in {@link #onResume()} to guarantee that it will be called.
      */
     private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap == null) {
-            // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
-            // Check if we were successful in obtaining the map.
-            if (mMap != null) {
-                setUpMap();
+        try {
+            // Do a null check to confirm that we have not already instantiated the map.
+            if (mMap == null) {
+                // Try to obtain the map from the SupportMapFragment.
+                mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+                        .getMap();
+                // Check if we were successful in obtaining the map.
+                if (mMap != null) {
+                    setUpMap();
+                }
             }
+        }catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 
@@ -163,21 +168,25 @@ public class map extends FragmentActivity {
 
     public void placeUserPin(View view)
     {
+        /*
         TextView text=(TextView)findViewById(R.id.userlat);
         TextView text2=(TextView)findViewById(R.id.userlong);
         text.setText(""+userLatitude);
         text2.setText(""+userLongitude);
         mMap.addMarker(new MarkerOptions().position(new LatLng(userLatitude, userLongitude)).title("User Location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc,18.0f));
+        */
     }
 
     public void placeOtherPin(View view)
     {
+        /*
         TextView text=(TextView)findViewById(R.id.otherlat);
         TextView text2=(TextView)findViewById(R.id.otherlong);
         text.setText(""+otherLatitude);
         text2.setText(""+otherLongitude);
         mMap.addMarker(new MarkerOptions().position(new LatLng(otherLatitude, otherLongitude)).title("Other Location"));
+        */
     }
 }
 

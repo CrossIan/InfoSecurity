@@ -2,6 +2,8 @@ package com.infosecurity.mac_celllocator;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -10,12 +12,18 @@ import android.location.LocationListener;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -49,7 +57,8 @@ public class RegisterAccessPointLocation extends Activity {
     public Map<String, WifiAccessPoint> mAccessPoints;
     public List<ScanResult> scanResults;
     public WifiAccessPoint[] lAccessPoints;
-    public int uX, uY, uZ;
+    public double uX, uY, uZ;
+    public double uLat, uLong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,9 +73,12 @@ public class RegisterAccessPointLocation extends Activity {
 
         registerReceiver(mReceiver, mIntentFilter);
 
-        uX = 0;
-        uY = 0;
-        uZ = 0;
+        uX = 0.0;
+        uY = 0.0;
+        uZ = 0.0;
+        uLat = 40.002162;
+        uLong = -83.015655;
+
 
 
         lAccessPoints = new WifiAccessPoint[5];
@@ -74,7 +86,10 @@ public class RegisterAccessPointLocation extends Activity {
             accessPoint = null;
         }
 
-            mAccessPoints = new HashMap<String, WifiAccessPoint>(2048);
+        mAccessPoints = new HashMap<String, WifiAccessPoint>(2048);
+
+        loadAccessPoints();
+
     }
 
 
@@ -152,60 +167,54 @@ public class RegisterAccessPointLocation extends Activity {
 
     public void refreshAccessPoints(View view)
     {
-        if(scanResults.size()>0)
-        {
-            lAccessPoints[0] = mAccessPoints.get(scanResults.listIterator(0).next().BSSID);
-            if(scanResults.size()>1)
-            {
-                lAccessPoints[1] = mAccessPoints.get(scanResults.listIterator(1).next().BSSID);
-                if(scanResults.size()>2)
-                {
-                    lAccessPoints[2] = mAccessPoints.get(scanResults.listIterator(2).next().BSSID);
-                    if(scanResults.size()>3)
-                    {
-                        lAccessPoints[3] = mAccessPoints.get(scanResults.listIterator(3).next().BSSID);
-                        if(scanResults.size()>4)
-                        {
-                            lAccessPoints[4] = mAccessPoints.get(scanResults.listIterator(4).next().BSSID);
-                        }
-                        else
-                        {
+        mWifiManager.startScan();
+
+        System.out.println("refreshAccessPoints");
+        try {
+            if (scanResults.size() > 0) {
+                lAccessPoints[0] = mAccessPoints.get(scanResults.listIterator(0).next().BSSID);
+                if (scanResults.size() > 1) {
+                    lAccessPoints[1] = mAccessPoints.get(scanResults.listIterator(1).next().BSSID);
+                    if (scanResults.size() > 2) {
+                        lAccessPoints[2] = mAccessPoints.get(scanResults.listIterator(2).next().BSSID);
+                        if (scanResults.size() > 3) {
+                            lAccessPoints[3] = mAccessPoints.get(scanResults.listIterator(3).next().BSSID);
+                            if (scanResults.size() > 4) {
+                                lAccessPoints[4] = mAccessPoints.get(scanResults.listIterator(4).next().BSSID);
+                            } else {
+                                lAccessPoints[4] = null;
+                            }
+                        } else {
+                            lAccessPoints[3] = null;
                             lAccessPoints[4] = null;
                         }
-                    }
-                    else
-                    {
+                    } else {
+                        lAccessPoints[2] = null;
                         lAccessPoints[3] = null;
                         lAccessPoints[4] = null;
                     }
-                }
-                else
-                {
+                } else {
+                    lAccessPoints[1] = null;
                     lAccessPoints[2] = null;
                     lAccessPoints[3] = null;
                     lAccessPoints[4] = null;
                 }
-            }
-            else
-            {
+            } else {
+                lAccessPoints[0] = null;
                 lAccessPoints[1] = null;
                 lAccessPoints[2] = null;
                 lAccessPoints[3] = null;
                 lAccessPoints[4] = null;
             }
-        }
-        else
+        }catch (Exception e)
         {
-            lAccessPoints[0] = null;
-            lAccessPoints[1] = null;
-            lAccessPoints[2] = null;
-            lAccessPoints[3] = null;
-            lAccessPoints[4] = null;
+            System.out.println(e.getMessage());
         }
     }
 
     public void activate0(View view)
     {
+        System.out.println("activate0");
         try {
             int iX = Integer.valueOf(((EditText) findViewById(R.id.apX0)).getText().toString());
             int iY = Integer.valueOf(((EditText) findViewById(R.id.apY0)).getText().toString());
@@ -215,6 +224,7 @@ public class RegisterAccessPointLocation extends Activity {
             if (lAccessPoints[0] != null) {
                 lAccessPoints[0].SaveCoordinates(iX, iY, iZ, true);
             }
+            saveAccessPoints();
         }catch(Exception e)
         {
             System.out.println(e.getMessage());
@@ -222,6 +232,7 @@ public class RegisterAccessPointLocation extends Activity {
     }
     public void activate1(View view)
     {
+        System.out.println("activate1");
         try {
             int iX =  Integer.valueOf(((EditText)findViewById(R.id.apX1)).getText().toString());
             int iY = Integer.valueOf(((EditText)findViewById(R.id.apY1)).getText().toString());
@@ -231,6 +242,7 @@ public class RegisterAccessPointLocation extends Activity {
             if(lAccessPoints[1]!=null) {
                 lAccessPoints[1].SaveCoordinates(iX, iY, iZ, true);
             }
+            saveAccessPoints();
         }catch(Exception e)
         {
             System.out.println(e.getMessage());
@@ -238,6 +250,7 @@ public class RegisterAccessPointLocation extends Activity {
     }
     public void activate2(View view)
     {
+        System.out.println("activate2");
         try {
             int iX =  Integer.valueOf(((EditText)findViewById(R.id.apX2)).getText().toString());
             int iY = Integer.valueOf(((EditText)findViewById(R.id.apY2)).getText().toString());
@@ -247,6 +260,7 @@ public class RegisterAccessPointLocation extends Activity {
             if(lAccessPoints[2]!=null) {
                 lAccessPoints[2].SaveCoordinates(iX, iY, iZ, true);
             }
+            saveAccessPoints();
         }catch(Exception e)
         {
         System.out.println(e.getMessage());
@@ -254,6 +268,7 @@ public class RegisterAccessPointLocation extends Activity {
     }
     public void activate3(View view)
     {
+        System.out.println("activate3");
         try {
             int iX =  Integer.valueOf(((EditText)findViewById(R.id.apX3)).getText().toString());
             int iY = Integer.valueOf(((EditText)findViewById(R.id.apY3)).getText().toString());
@@ -263,6 +278,7 @@ public class RegisterAccessPointLocation extends Activity {
             if(lAccessPoints[3]!=null) {
                 lAccessPoints[3].SaveCoordinates(iX, iY, iZ, true);
             }
+            saveAccessPoints();
         }catch(Exception e)
         {
         System.out.println(e.getMessage());
@@ -270,6 +286,7 @@ public class RegisterAccessPointLocation extends Activity {
     }
     public void activate4(View view)
     {
+        System.out.println("activate4");
         try {
             int iX =  Integer.valueOf(((EditText) findViewById(R.id.apX4)).getText().toString());
             int iY = Integer.valueOf(((EditText)findViewById(R.id.apY4)).getText().toString());
@@ -279,47 +296,218 @@ public class RegisterAccessPointLocation extends Activity {
             if(lAccessPoints[4]!=null) {
                 lAccessPoints[4].SaveCoordinates(iX, iY, iZ, true);
             }
+            saveAccessPoints();
         }catch(Exception e)
         {
         System.out.println(e.getMessage());
         }
     }
 
-    public void updateUserCoordinates()
+    private void loadAccessPoints()
     {
+        String filename = "mAccessPoints";
+        String string = "";
+        FileInputStream inputStream;
 
         try {
-        int t = 0;
-        int tx = 0;
-        int ty = 0;
-        int tz = 0;
-
-        for(ScanResult scanResult : scanResults)
-        {
-            if(mAccessPoints.containsKey(scanResult.BSSID))
+            inputStream = openFileInput(filename);
+            boolean bGoodInput = true;
+            if(inputStream.available()<2)  // There would probably be a better way to do this, but this was quick and easy.  This pre-loads many of the Access Points from Dreese Labs.
             {
-                if(mAccessPoints.get(scanResult.BSSID).bInit)
+                String defaultAccessPoints = "WiFi@OSU\n6c:f3:7f:52:53:63\n62\n32\n38\nWiFi@OSU\n6c:f3:7f:52:50:b1\n29\n21\n38\nWiFi@OSU\n6c:f3:7f:52:51:23\n54\n15\n38\neduroam\n6c:f3:7f:52:51:20\n54\n15\n38\neduroam\n6c:f3:7f:52:50:a0\n29\n21\n38\nosuwireless\n6c:f3:7f:52:52:61\n63\n25\n38\nosuwireless\n6c:f3:7f:52:52:50\n30\n40\n38\nosuwireless\n6c:f3:7f:52:53:61\n62\n32\n38\nWiFi@OSU\n6c:f3:7f:52:53:03\n48\n21\n38\nWiFi@OSU\n6c:f3:7f:52:52:63\n63\n25\n38\neduroam\n6c:f3:7f:52:53:f2\n78\n8\n38\nosuwireless\n6c:f3:7f:52:53:01\n48\n21\n38\nosuwireless\n6c:f3:7f:52:4d:a1\n91\n24\n38\nosuwireless\n6c:f3:7f:52:53:f0\n78\n8\n38\neduroam\n6c:f3:7f:52:53:00\n48\n21\n38\nWiFi@OSU\n6c:f3:7f:52:53:f1\n78\n8\n38\neduroam\n6c:f3:7f:52:52:52\n30\n40\n38\nWiFi@OSU\n6c:f3:7f:52:51:83\n84\n50\n38\nosuwireless\n6c:f3:7f:52:51:81\n84\n50\n38\neduroam\n6c:f3:7f:52:51:80\n84\n50\n38\nWiFi@OSU\n6c:f3:7f:52:4d:a3\n91\n24\n38\nWiFi@OSU\n6c:f3:7f:52:50:a3\n29\n21\n38\neduroam\n6c:f3:7f:52:4d:a0\n91\n24\n38\neduroam\n6c:f3:7f:52:50:b2\n29\n21\n38\nosuwireless\n6c:f3:7f:52:51:30\n54\n15\n38\neduroam\n6c:f3:7f:52:52:60\n63\n25\n38\neduroam\n6c:f3:7f:52:51:32\n54\n15\n38\nosuwireless\n6c:f3:7f:52:50:b0\n29\n21\n38\nWiFi@OSU\n6c:f3:7f:52:52:51\n30\n40\n38\neduroam\n6c:f3:7f:52:53:72\n62\n32\n38\nosuwireless\n6c:f3:7f:52:50:a1\n29\n21\n38\nosuwireless\n6c:f3:7f:52:51:21\n54\n15\n38\neduroam\n6c:f3:7f:52:53:60\n62\n32\n38\n";
+
+
+                FileOutputStream outputStream;
+                outputStream = openFileOutput(filename, Context.MODE_WORLD_READABLE);
+                outputStream.write(defaultAccessPoints.getBytes());
+                outputStream.close();
+
+                inputStream = openFileInput(filename);
+            }
+            while(inputStream.available()>0 && bGoodInput) {
+                char nextChar='\n';
+                String sSSID="";
+                String sBSSID="";
+                String sX = "";
+                String sY = "";
+                String sZ = "";
+                int iX=0;
+                int iY=0;
+                int iZ=0;
+
+                do {
+                    nextChar = (char) inputStream.read();
+                    if(nextChar!='\n') {
+                        sSSID = sSSID + nextChar;
+                    }
+                } while (nextChar!='\n');
+
+                do {
+                    nextChar = (char) inputStream.read();
+                    if(nextChar!='\n') {
+                        sBSSID = sBSSID + nextChar;
+                    }
+                } while (nextChar!='\n');
+
+                do {
+                    nextChar = (char) inputStream.read();
+                    if(nextChar!='\n') {
+                        sX = sX + nextChar;
+                    }
+                } while (nextChar!='\n');
+                do {
+                    nextChar = (char) inputStream.read();
+                    if(nextChar!='\n') {
+                        sY = sY + nextChar;
+                    }
+                } while (nextChar!='\n');
+                do {
+                    nextChar = (char) inputStream.read();
+                    if(nextChar!='\n') {
+                        sZ = sZ + nextChar;
+                    }
+                } while (nextChar!='\n');
+
+                iX = Integer.parseInt(sX);
+                iY = Integer.parseInt(sY);
+                iZ = Integer.parseInt(sZ);
+
+                if(!mAccessPoints.containsKey(sBSSID))
                 {
-                    t += scanResult.level;
-                    tx += scanResult.level * mAccessPoints.get(scanResult.BSSID).iX;
-                    ty += scanResult.level * mAccessPoints.get(scanResult.BSSID).iY;
-                    tz += scanResult.level * mAccessPoints.get(scanResult.BSSID).iZ;
+                    mAccessPoints.put(sBSSID,new WifiAccessPoint(sSSID,sBSSID));
+                    mAccessPoints.get(sBSSID).SaveCoordinates(iX,iY,iZ,true);
                 }
+            }
+        }catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void saveAccessPoints()
+    {
+        String filename = "mAccessPoints";
+        String string = "";
+
+        for(WifiAccessPoint accessPoint : mAccessPoints.values())
+        {
+            if(accessPoint.bInit)
+            {
+                string = string + accessPoint.sSSID + "\n" +
+                        accessPoint.sBSSID + "\n" +
+                        accessPoint.iX + "\n" +
+                        accessPoint.iY + "\n" +
+                        accessPoint.iZ + "\n";
             }
         }
 
-        uX = tx/t;
-        uY = ty/t;
-        uZ = tz/t;
+        FileOutputStream outputStream;
 
-        TextView disXval = (TextView) findViewById(R.id.disXval);
-        TextView disYval = (TextView) findViewById(R.id.disYval);
-        TextView disZval = (TextView) findViewById(R.id.disZval);
+        try {
+            outputStream = openFileOutput(filename, Context.MODE_WORLD_READABLE);
+            outputStream.write(string.getBytes());
+            outputStream.close();
 
-        disXval.setText(""+uX);
-        disYval.setText(""+uY);
-        disZval.setText(""+uZ);
-        }catch(Exception e)
+            if(isExternalStorageReadable()&&isExternalStorageWritable())
+            {
+                File mAccessPointsFile = getFileStorageDir("mAccessPoints.txt");
+                mAccessPointsFile.setWritable(true);
+                mAccessPointsFile.setReadable(true);
+
+                FileWriter fileWriter = new FileWriter(mAccessPointsFile);
+                fileWriter.write(string);
+                fileWriter.close();
+
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("label",string);
+                clipboard.setPrimaryClip(clip);
+
+            }
+        } catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    /* Checks if external storage is available to at least read */
+    public boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    public File getFileStorageDir(String fileName) {
+        // Get the directory for the user's public documents directory.
+        File file = new File(context.getFilesDir(), fileName);
+        file.delete();
+        return file;
+    }
+
+    public void updateUserCoordinates()
+    {
+        mWifiManager.startScan();
+
+
+        try {
+            double t = 0;
+            double tx = 0;
+            double ty = 0;
+            double tz = 0;
+
+            for(ScanResult scanResult : scanResults)
+            {
+                if(mAccessPoints.containsKey(scanResult.BSSID))
+                {
+                    if(mAccessPoints.get(scanResult.BSSID).bInit)
+                    {
+                        t += Math.log(scanResult.level + 100);
+                        tx += Math.log(scanResult.level + 100) * mAccessPoints.get(scanResult.BSSID).iX;
+                        ty += Math.log(scanResult.level + 100) * mAccessPoints.get(scanResult.BSSID).iY;
+                        tz += Math.log(scanResult.level + 100) * mAccessPoints.get(scanResult.BSSID).iZ;
+                    }
+                }
+            }
+
+            uX = tx/t;
+            uY = ty/t;
+            uZ = tz/t;
+
+            if(t==0)
+            {
+                uX = 0;
+                uY = 0;
+                uZ = 0;
+            }
+
+            uLat = 40.002162 + (2.6981e-6 * uX) - (4.66e-7 * uY);
+            uLong = -83.015655 - (6.08e-7 * uX) - (3.522e-6 * uY);
+
+            TextView disXval = (TextView) findViewById(R.id.disXval);
+            TextView disYval = (TextView) findViewById(R.id.disYval);
+            TextView disZval = (TextView) findViewById(R.id.disZval);
+
+            TextView disLatval = (TextView) findViewById(R.id.disLatval);
+            TextView disLongval = (TextView) findViewById(R.id.disLongval);
+
+            disXval.setText(""+uX);
+            disYval.setText(""+uY);
+            disZval.setText(""+uZ);
+
+            disLatval.setText(""+uLat);
+            disLongval.setText(""+uLong);
+        }catch(Exception e)// Sometimes gets Divide By Zero... try-catch is an easy, but uninspired fix
         {
             System.out.println(e.getMessage());
         }
@@ -343,6 +531,7 @@ public class RegisterAccessPointLocation extends Activity {
 
             if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(action))
             {
+                System.out.println("Scan Refresh");
 
                 scanResults = mWifiManager.getScanResults();
                 Collections.sort(scanResults, new Comparator<ScanResult>() {

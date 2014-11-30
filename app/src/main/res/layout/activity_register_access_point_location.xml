@@ -44,7 +44,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="3dip"
-                            android:maxLength="6"
+                            android:maxLength="4"
                             android:text="0"/>
                         <TextView
                             android:id="@+id/disY"
@@ -58,7 +58,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="3dip"
-                            android:maxLength="6"
+                            android:maxLength="4"
                             android:text="0"/>
                         <TextView
                             android:id="@+id/disZ"
@@ -72,9 +72,37 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="3dip"
-                            android:maxLength="6"
+                            android:maxLength="4"
                             android:text="0"/>
-                            </TableRow>
+                        <TextView
+                            android:id="@+id/disLat"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="3dip"
+                            android:maxLength="4"
+                            android:text="Lat:"/>
+                        <TextView
+                            android:id="@+id/disLatval"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="3dip"
+                            android:maxLength="9"
+                            android:text="40.002162"/>
+                        <TextView
+                            android:id="@+id/disLong"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="3dip"
+                            android:maxLength="5"
+                            android:text="Long:"/>
+                        <TextView
+                            android:id="@+id/disLongval"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="3dip"
+                            android:maxLength="9"
+                            android:text="-83.015655"/>
+                    </TableRow>
 
                 </TableLayout>
 

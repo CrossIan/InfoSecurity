@@ -16,7 +16,7 @@ public class WifiAccessPoint {
     public float fLongitude;
 
 
-    //This is the offset from the bottom southeast corner of Dreese Labs (in feet) (40.002140, -83.015666)
+    //This is the offset from the bottom southeast corner of Dreese Labs (in feet) (40.002162, -83.015655) (coordinates are rotated off by 9.8 degrees)
     public int iX; //North
     public int iY; //West
     public int iZ; //Up

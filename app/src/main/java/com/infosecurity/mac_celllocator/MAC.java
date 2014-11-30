@@ -126,17 +126,21 @@ public class MAC extends Activity {
         return false;
     }
     public void sendSelfIP(View view){
+        /*
         TextView text=(TextView)findViewById(R.id.useriptext);
         text.setText(ipstring);
+        */
     }
 
     public void sendCompIPs(View view){
+        /*
         TextView text=(TextView)findViewById(R.id.otheriptext1);
         TextView text2=(TextView)findViewById(R.id.otheriptext2);
         TextView text3=(TextView)findViewById(R.id.otheriptext3);
         text.setText(compIPs[0]);
         text2.setText(compIPs[1]);
         text3.setText(compIPs[2]);
+        */
     }
 
     /* register the broadcast receiver with the intent values to be matched */
